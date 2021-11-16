@@ -17,7 +17,7 @@ function InfoTooltip({ isOpen, toggleTooltip, isRegistered }) {
           className="tooltip__close-button"
           type="reset"
           name="close"
-          onClose={toggleTooltip}
+          onClick={toggleTooltip}
         />
       </div>
     </div>

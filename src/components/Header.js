@@ -1,7 +1,7 @@
 import React from "react";
 import logo from "../images/Vector.svg";
 
-function Header(props) {
+function Header({email, ...props}) {
   function logout() {
     localStorage.removeItem("jwt");
     props.handleLogout();
@@ -16,7 +16,7 @@ function Header(props) {
         src={logo}
       />
       <div className="header__container">
-        <p className="header__email">{props.email}</p>
+        <p className="header__email">{email}</p>
         <button className="header__logout" onClick={logout}>
           Log out
         </button>

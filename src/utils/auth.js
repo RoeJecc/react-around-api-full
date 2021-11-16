@@ -16,6 +16,7 @@ export const register = (password, email) => {
 export const authorize = (password, email) => {
     return fetch(`${BASE_URL}/signin`, {
         method: 'POST',
+        referrerPolicy: 'no-referrer',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
