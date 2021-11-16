@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import logo from "../images/Vector.svg";
 
 function Login(props) {
     const [email, setEmail] = useState('');
@@ -13,15 +14,27 @@ function Login(props) {
         setPassword(e.target.value)
     }
 
+    function resetInfo() {
+        setEmail("");
+        setPassword("");
+      }
+
+    function handleSubmit(e) {
+        e.preventDefault();
+        props.handleAuthorize(password, email);
+        resetInfo();
+    }
+
 return (
     <div className='login'>
         <div className='login__container'>
-            <img src={props.logo} alt="logo" className="logo" />
+            <img src={logo} alt="logo" className="logo" />
             <Link to='/signup' className='login__link'>Sign up</Link>
         </div>
         <form 
             action="#" 
             className='login__form'
+            onSubmit={handleSubmit}
             >
             <p className="login__title">Log in</p>
             <input 

@@ -16,7 +16,7 @@ import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import api from "../utils/api.js";
 import PopupWithForm from "./PopupWithForm.js";
 import CurrentUserContext from "../contexts/CurrentUserContext.js";
-import * as auth from "../utils/auth"
+import {checkToken, authorize, register} from '../utils/auth';
 
 
 function App() {
@@ -28,6 +28,9 @@ function App() {
   const [imagePopupOpen, setImagePopupOpen] = useState(false);
   const [infoTooltipOpen, setInfoTooltipOpen] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [openTooltip, setOpenTooltip] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [email, setEmail] = useState('');
 
   const [cards, setCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
@@ -137,22 +140,44 @@ function App() {
     setImagePopupOpen(true);
   }
 
-  function handleRegister (email, password) {
-    if (!email || !password) {
-      return;
-    }
-    auth.register(email, password)
-    .then((res) => {
-      if (res) {
-        setIsRegistered(true);
-        setInfoTooltipOpen(true);
-        history.push('/signin');
-      } else {
+  function toggleTooltip() {
+    setOpenTooltip(!openTooltip);
+  }
+
+  function handleRegister(password, email) {
+    return register(password, email)
+      .then((res) => {
+        if (res.data) {
+          setLoggedIn(true);
+          history.push("/signin");
+          handleAuthorize(password, email);
+          setIsRegistered(true);
+          toggleTooltip();
+          return;
+        }
         setIsRegistered(false);
-        setInfoTooltipOpen(true);
-      }    
-    })
-    .catch((err) => {console.log(err)})
+        toggleTooltip();
+      })
+      .catch((err) => console.log(err));
+  }
+
+  function handleAuthorize(password, email) {
+    authorize(password, email)
+      .then(({ token }) => {
+        if (token) {
+          localStorage.setItem("jwt", token);
+          setLoggedIn(true);
+          setEmail(email);
+          return;
+        }
+        setIsRegistered(false);
+        toggleTooltip();
+      })
+      .catch((err) => console.log(err));
+  }
+
+  function handleLogin() {
+    setLoggedIn(!loggedIn);
   }
 
   React.useEffect(() => {
@@ -167,17 +192,42 @@ function App() {
     return () => document.removeEventListener("keydown", closeByEscape);
   }, []);
 
+  React.useEffect(() => {
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
+      return checkToken(jwt)
+      .then(({ data }) => {
+        if (data) {
+          setLoggedIn(true);
+          setEmail(data.email);
+          return
+        }
+        setLoggedIn(false);
+      })
+      .catch((err) => console.log(err));
+    }
+    setLoggedIn(false);
+  }, []);
+
   return (
     <div className="page">
       <CurrentUserContext.Provider value={currentUser}>
         <Switch>
           <Route path="/signin">
-            <Login />
+            {loggedIn ? (
+              <Redirect to="/" />
+            ) : (
+              <Login handleAuthorize={handleAuthorize} />
+            )}
           </Route>
           <Route path="/signup">
-            <Register handleRegister={handleRegister} />
+            {loggedIn ? (
+              <Redirect to="/" />
+            ) : (
+              <Register handleRegister={handleRegister} />
+            )}
           </Route>
-          <ProtectedRoute path="/">
+          <ProtectedRoute path="/" loggedIn={loggedIn}>
             <Header />
             <Main
               onEditAvatarClick={handleEditAvatarClick}
@@ -193,7 +243,6 @@ function App() {
             isOpen={infoTooltipOpen}
             onClose={handleCloseAllPopups}
             isRegistered={isRegistered}
-
             />
             <EditAvatarPopup
               isOpen={editAvatarOpen}
