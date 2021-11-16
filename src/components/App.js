@@ -3,17 +3,22 @@ import React, { useState } from "react";
 import Header from "./Header.js";
 import Main from "./Main.js";
 import Footer from "./Footer.js";
+import Login from "./Login.js";
+import Register from "./Register.js";
+import ProtectedRoute from "./ProtectedRoute.js";
 
 import EditAvatarPopup from "./EditAvatarPopup.js";
 import EditProfilePopup from "./EditProfilePopup.js";
 import AddPlacePopup from "./AddPlacePopup.js";
 import ImagePopup from "./ImagePopup.js";
-
+import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import api from "../utils/api.js";
 import PopupWithForm from "./PopupWithForm.js";
 import CurrentUserContext from "../contexts/CurrentUserContext.js";
 
 function App() {
+  const history = useHistory();
+
   const [editAvatarOpen, setEditAvatarOpen] = useState(false);
   const [editProfileOpen, setEditProfileOpen] = useState(false);
   const [addPlaceOpen, setAddPlaceOpen] = useState(false);
@@ -73,7 +78,7 @@ function App() {
         setCurrentUser(res);
         closeAllPopups();
       })
-      .catch((err) => console.log(err))
+      .catch((err) => console.log(err));
   }
 
   function handleUpdateAvatar(avatar) {
@@ -83,16 +88,17 @@ function App() {
         setCurrentUser(res);
         closeAllPopups();
       })
-      .catch((err) => console.log(err))
+      .catch((err) => console.log(err));
   }
 
-  function handleAddPlace({name, link}){
-    api.addCard({name, link})
-    .then((newCard) => {
-      setCards([newCard, ...cards])
-      closeAllPopups();
-    })
-    .catch((err) => console.log(err))
+  function handleAddPlace({ name, link }) {
+    api
+      .addCard({ name, link })
+      .then((newCard) => {
+        setCards([newCard, ...cards]);
+        closeAllPopups();
+      })
+      .catch((err) => console.log(err));
   }
 
   function handleEditAvatarClick() {
@@ -126,58 +132,67 @@ function App() {
 
   React.useEffect(() => {
     const closeByEscape = (e) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         closeAllPopups();
       }
-    }
+    };
 
-    document.addEventListener('keydown', closeByEscape)
-    
-    return () => document.removeEventListener('keydown', closeByEscape)
-}, [])
+    document.addEventListener("keydown", closeByEscape);
 
+    return () => document.removeEventListener("keydown", closeByEscape);
+  }, []);
 
   return (
     <div className="page">
       <CurrentUserContext.Provider value={currentUser}>
-        <Header />
-        <Main
-          onEditAvatarClick={handleEditAvatarClick}
-          onEditProfileClick={handleEditProfileClick}
-          onAddPlaceClick={handleAddPlaceClick}
-          cards={cards}
-          onCardClick={handleCardClick}
-          onCardLike={handleCardLike}
-          onCardDelete={handleCardDelete}
-        />
-        <Footer />
-        <EditAvatarPopup
-          isOpen={editAvatarOpen}
-          onClose={handleCloseAllPopups}
-          onUpdateAvatar={handleUpdateAvatar}
-        />
-        <EditProfilePopup
-          isOpen={editProfileOpen}
-          onClose={handleCloseAllPopups}
-          onUpdateUser={handleUpdateUser}
-        />
-        <AddPlacePopup
-          isOpen={addPlaceOpen}
-          onClose={handleCloseAllPopups}
-          onAddPlace={handleAddPlace}
-        />
+        <Switch>
+          <Route path="/signin">
+            <Login />
+          </Route>
+          <Route path="/signup">
+            <Register />
+          </Route>
+          <ProtectedRoute path="/">
+            <Header />
+            <Main
+              onEditAvatarClick={handleEditAvatarClick}
+              onEditProfileClick={handleEditProfileClick}
+              onAddPlaceClick={handleAddPlaceClick}
+              cards={cards}
+              onCardClick={handleCardClick}
+              onCardLike={handleCardLike}
+              onCardDelete={handleCardDelete}
+            />
+            <Footer />
+            <EditAvatarPopup
+              isOpen={editAvatarOpen}
+              onClose={handleCloseAllPopups}
+              onUpdateAvatar={handleUpdateAvatar}
+            />
+            <EditProfilePopup
+              isOpen={editProfileOpen}
+              onClose={handleCloseAllPopups}
+              onUpdateUser={handleUpdateUser}
+            />
+            <AddPlacePopup
+              isOpen={addPlaceOpen}
+              onClose={handleCloseAllPopups}
+              onAddPlace={handleAddPlace}
+            />
 
-        <ImagePopup
-          card={selectedCard}
-          isOpen={imagePopupOpen}
-          onClose={closeAllPopups}
-        />
+            <ImagePopup
+              card={selectedCard}
+              isOpen={imagePopupOpen}
+              onClose={closeAllPopups}
+            />
 
-        <PopupWithForm
-          name="delete-card"
-          title="Are you sure?"
-          buttonText="Yes"
-        />
+            <PopupWithForm
+              name="delete-card"
+              title="Are you sure?"
+              buttonText="Yes"
+            />
+          </ProtectedRoute>
+        </Switch>
       </CurrentUserContext.Provider>
     </div>
   );
