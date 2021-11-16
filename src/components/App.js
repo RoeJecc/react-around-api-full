@@ -6,6 +6,7 @@ import Footer from "./Footer.js";
 import Login from "./Login.js";
 import Register from "./Register.js";
 import ProtectedRoute from "./ProtectedRoute.js";
+import InfoTooltip from "./InfoTooltip.js";
 
 import EditAvatarPopup from "./EditAvatarPopup.js";
 import EditProfilePopup from "./EditProfilePopup.js";
@@ -15,6 +16,8 @@ import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import api from "../utils/api.js";
 import PopupWithForm from "./PopupWithForm.js";
 import CurrentUserContext from "../contexts/CurrentUserContext.js";
+import * as auth from "../utils/auth"
+
 
 function App() {
   const history = useHistory();
@@ -23,6 +26,9 @@ function App() {
   const [editProfileOpen, setEditProfileOpen] = useState(false);
   const [addPlaceOpen, setAddPlaceOpen] = useState(false);
   const [imagePopupOpen, setImagePopupOpen] = useState(false);
+  const [infoTooltipOpen, setInfoTooltipOpen] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
+
   const [cards, setCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
@@ -118,6 +124,7 @@ function App() {
     setEditProfileOpen(false);
     setAddPlaceOpen(false);
     setImagePopupOpen(false);
+    setInfoTooltipOpen(false);
   }
 
   function handleCloseAllPopups(e) {
@@ -128,6 +135,24 @@ function App() {
   function handleCardClick(card) {
     setSelectedCard(card);
     setImagePopupOpen(true);
+  }
+
+  function handleRegister (email, password) {
+    if (!email || !password) {
+      return;
+    }
+    auth.register(email, password)
+    .then((res) => {
+      if (res) {
+        setIsRegistered(true);
+        setInfoTooltipOpen(true);
+        history.push('/signin');
+      } else {
+        setIsRegistered(false);
+        setInfoTooltipOpen(true);
+      }    
+    })
+    .catch((err) => {console.log(err)})
   }
 
   React.useEffect(() => {
@@ -150,7 +175,7 @@ function App() {
             <Login />
           </Route>
           <Route path="/signup">
-            <Register />
+            <Register handleRegister={handleRegister} />
           </Route>
           <ProtectedRoute path="/">
             <Header />
@@ -164,6 +189,12 @@ function App() {
               onCardDelete={handleCardDelete}
             />
             <Footer />
+            <InfoTooltip 
+            isOpen={infoTooltipOpen}
+            onClose={handleCloseAllPopups}
+            isRegistered={isRegistered}
+
+            />
             <EditAvatarPopup
               isOpen={editAvatarOpen}
               onClose={handleCloseAllPopups}

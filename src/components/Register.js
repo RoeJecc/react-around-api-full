@@ -15,6 +15,11 @@ function Register(props) {
         setError({...error, [e.target.name]: e.target.validationMessage})
     }
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        props.handleRegister(email, password);    
+      }
+
     return (
         <div className='login'>
             <div className='login__container'>
@@ -24,6 +29,7 @@ function Register(props) {
             <form 
                 action="#" 
                 className='login__form'
+                onSubmit={handleSubmit}
                 >
                 <p className="login__title">Sign up</p>
                 <input 
