@@ -1,19 +1,24 @@
 import React from "react";
-import SuccessIcon from "../images/Union.svg";
-import FailureIcon from "../images/Union2.svg";
 
-
-function InfoTooltip({ isOpen, onClose, isRegistered }) {
-
-
-  return(
-    <div className={`modal modal_type_tooltip ${isOpen ? "modal_open" : ""}`} onClick={onClose}>
-      <div className="modal__container">
-        <button className="modal__close-button modal__close-button_type_form" type="button" aria-label="Close modal" onClick={onClose}></button>
-        <div className="modal__form modal__form_type_tooltip">
-          <img src={isRegistered ? SuccessIcon : FailureIcon} className="modal__tooltip-icon" alt="success icon" />
-          <h2 className="modal__tooltip-text">{isRegistered ? 'Success! You have now been registered.' : 'Oops, something went wrong! Please try again.'}</h2>
-        </div>
+function InfoTooltip({ isOpen, toggleTooltip, isRegistered }) {
+  return (
+    <div
+      className={`tooltip ${isOpen && "tooltip_visible"}`}
+      onClick={(e) => e.target === e.currentTarget && toggleTooltip()}
+    >
+      <div className="tooltip__container">
+        <div className={isRegistered ? "tooltip__success" : "tooltip__error"} />
+        <p className="tooltip__text">
+          {isRegistered
+            ? "Success! You are now registered."
+            : "Oops, something went wrong! Please try again."}
+        </p>
+        <button
+          className="tooltip__close-button"
+          type="reset"
+          name="close"
+          onClose={toggleTooltip}
+        />
       </div>
     </div>
   );

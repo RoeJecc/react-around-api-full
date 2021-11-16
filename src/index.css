@@ -14,6 +14,7 @@
 @import url(./blocks/modal/_open/modal_open.css);
 @import url(./blocks/modal/__form-submit/_delete/modal__form-submit_delete.css);
 @import url(./blocks/login/login.css);
+@import url(./blocks/tooltip/tooltip.css);
 
 html, body, #root, .App {
   height: 100%;

@@ -4,6 +4,38 @@
     margin: 45px 200px 36px;
     padding: 0;
     border-bottom: 1px solid rgb(84,84,84, .7);
+    display: flex;
+    width: auto;
+    justify-content: space-between;
+}
+
+.header__container{
+    display: flex;
+    height: 100%;
+}
+
+.header__logout{
+    background-color: #0000;
+    border: 0;
+    font-weight: normal;
+    font-size: 18px;
+    line-height: 22px;
+    color: #A9A9A9;
+    transition: all .2s;
+    cursor: pointer;
+    height: 22px;
+}
+
+.header__log:hover{
+    color: #FFFF;
+}
+
+.header__email{
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 22px;
+    padding-right: 24px;
+    margin: 0;
 }
 
 @media screen and (max-width: 900px){

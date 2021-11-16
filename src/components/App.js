@@ -16,8 +16,7 @@ import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import api from "../utils/api.js";
 import PopupWithForm from "./PopupWithForm.js";
 import CurrentUserContext from "../contexts/CurrentUserContext.js";
-import {checkToken, authorize, register} from '../utils/auth';
-
+import { checkToken, authorize, register } from "../utils/auth";
 
 function App() {
   const history = useHistory();
@@ -26,11 +25,10 @@ function App() {
   const [editProfileOpen, setEditProfileOpen] = useState(false);
   const [addPlaceOpen, setAddPlaceOpen] = useState(false);
   const [imagePopupOpen, setImagePopupOpen] = useState(false);
-  const [infoTooltipOpen, setInfoTooltipOpen] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
   const [openTooltip, setOpenTooltip] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
 
   const [cards, setCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
@@ -127,7 +125,6 @@ function App() {
     setEditProfileOpen(false);
     setAddPlaceOpen(false);
     setImagePopupOpen(false);
-    setInfoTooltipOpen(false);
   }
 
   function handleCloseAllPopups(e) {
@@ -176,7 +173,7 @@ function App() {
       .catch((err) => console.log(err));
   }
 
-  function handleLogin() {
+  function handleLogout() {
     setLoggedIn(!loggedIn);
   }
 
@@ -196,15 +193,15 @@ function App() {
     const jwt = localStorage.getItem("jwt");
     if (jwt) {
       return checkToken(jwt)
-      .then(({ data }) => {
-        if (data) {
-          setLoggedIn(true);
-          setEmail(data.email);
-          return
-        }
-        setLoggedIn(false);
-      })
-      .catch((err) => console.log(err));
+        .then(({ data }) => {
+          if (data) {
+            setLoggedIn(true);
+            setEmail(data.email);
+            return;
+          }
+          setLoggedIn(false);
+        })
+        .catch((err) => console.log(err));
     }
     setLoggedIn(false);
   }, []);
@@ -228,7 +225,7 @@ function App() {
             )}
           </Route>
           <ProtectedRoute path="/" loggedIn={loggedIn}>
-            <Header />
+            <Header email={email} handleLogout={handleLogout} />
             <Main
               onEditAvatarClick={handleEditAvatarClick}
               onEditProfileClick={handleEditProfileClick}
@@ -239,11 +236,7 @@ function App() {
               onCardDelete={handleCardDelete}
             />
             <Footer />
-            <InfoTooltip 
-            isOpen={infoTooltipOpen}
-            onClose={handleCloseAllPopups}
-            isRegistered={isRegistered}
-            />
+            
             <EditAvatarPopup
               isOpen={editAvatarOpen}
               onClose={handleCloseAllPopups}
@@ -272,6 +265,15 @@ function App() {
               buttonText="Yes"
             />
           </ProtectedRoute>
+          <Route path="/">
+            {loggedIn ? <Redirect to="/" /> : <Redirect to="/signin" />}
+          </Route>
+          <InfoTooltip
+              isOpen={openTooltip}
+              onClose={toggleTooltip}
+              isRegistered={isRegistered}
+              toggleTooltip={toggleTooltip}
+            />
         </Switch>
       </CurrentUserContext.Provider>
     </div>
