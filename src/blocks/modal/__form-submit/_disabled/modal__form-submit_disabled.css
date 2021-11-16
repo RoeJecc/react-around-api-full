@@ -1,0 +1,6 @@
+.modal__form-submit_disabled{
+    opacity: .2;
+    color: black;
+    background-color: #E5E5E5;
+    outline: auto;
+}

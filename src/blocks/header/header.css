@@ -1,0 +1,20 @@
+@import url(./__vector/header__vector.css);
+
+.header{
+    margin: 45px 200px 36px;
+    padding: 0;
+    border-bottom: 1px solid rgb(84,84,84, .7);
+}
+
+@media screen and (max-width: 900px){
+    .header{
+        margin: 45px 100px 36px;
+    }
+}
+
+@media screen and (max-width: 550px){
+    .header{
+        margin: 28px 0 38px;
+    }
+}
+
