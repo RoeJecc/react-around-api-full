@@ -12,7 +12,7 @@ import EditAvatarPopup from "./EditAvatarPopup.js";
 import EditProfilePopup from "./EditProfilePopup.js";
 import AddPlacePopup from "./AddPlacePopup.js";
 import ImagePopup from "./ImagePopup.js";
-import { Redirect, Route, useHistory } from "react-router-dom";
+import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import api from "../utils/api.js";
 import PopupWithForm from "./PopupWithForm.js";
 import CurrentUserContext from "../contexts/CurrentUserContext.js";
@@ -270,7 +270,6 @@ function App() {
         </Route>
         <InfoTooltip
           isOpen={openTooltip}
-          onClose={toggleTooltip}
           isRegistered={isRegistered}
           toggleTooltip={toggleTooltip}
         />
