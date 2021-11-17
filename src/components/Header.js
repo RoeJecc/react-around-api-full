@@ -1,25 +1,32 @@
 import React from "react";
 import logo from "../images/Vector.svg";
+import { Link } from "react-router-dom";
 
-function Header({email, ...props}) {
+function Header({
+  onLogout,
+  handleLogout,
+  headerLink,
+  headerText,
+  loggedIn,
+  email,
+  onClick,
+}) {
   function logout() {
-    localStorage.removeItem("jwt");
-    props.handleLogout();
+    onLogout();
   }
 
   return (
     <header className="header">
-      <img
-        className="header__vector"
-        alt="Around The U.S."
-        id="vector-image"
-        src={logo}
-      />
+      <img src={logo} alt="logo" className="logo" />
       <div className="header__container">
-        <p className="header__email">{email}</p>
-        <button className="header__logout" onClick={logout}>
-          Log out
-        </button>
+        {loggedIn && <p className="header__email">{email}</p>}
+        <Link
+          className="header__logout"
+          to={headerLink}
+          onClick={loggedIn ? logout : ""}
+        >
+          {headerText}
+        </Link>
       </div>
     </header>
   );

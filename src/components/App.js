@@ -17,6 +17,7 @@ import api from "../utils/api.js";
 import PopupWithForm from "./PopupWithForm.js";
 import CurrentUserContext from "../contexts/CurrentUserContext.js";
 import { checkToken, authorize, register } from "../utils/auth";
+import { permittedCrossDomainPolicies } from "helmet";
 
 function App() {
   const history = useHistory();
@@ -150,13 +151,15 @@ function App() {
           handleAuthorize(password, email);
           setIsRegistered(true);
           setEmail(email);
-          toggleTooltip();
           return;
         }
-        setIsRegistered(false);
-        toggleTooltip();
       })
-      .catch((err) => console.log(err));
+      .catch(() => {
+        setIsRegistered(false);
+      })
+      .finally(() => {
+        toggleTooltip();
+      });
   }
 
   function handleAuthorize(password, email) {
@@ -174,8 +177,11 @@ function App() {
       .catch((err) => console.log(err));
   }
 
-  function handleLogout() {
-    setLoggedIn(!loggedIn);
+  function onLogout() {
+    setLoggedIn(false);
+    setEmail("");
+    localStorage.removeItem("jwt");
+    history.push("/signin");
   }
 
   React.useEffect(() => {
@@ -210,64 +216,72 @@ function App() {
   return (
     <div className="page">
       <CurrentUserContext.Provider value={currentUser}>
-        <Route path="/signin">
-          {loggedIn ? (
-            <Redirect to="/" />
-          ) : (
-            <Login handleAuthorize={handleAuthorize} />
-          )}
-        </Route>
-        <Route path="/signup">
-          {loggedIn ? (
-            <Redirect to="/" />
-          ) : (
-            <Register handleRegister={handleRegister} />
-          )}
-        </Route>
-        <ProtectedRoute path="/" loggedIn={loggedIn}>
-          <Header email={email} handleLogout={handleLogout} />
-          <Main
-            onEditAvatarClick={handleEditAvatarClick}
-            onEditProfileClick={handleEditProfileClick}
-            onAddPlaceClick={handleAddPlaceClick}
-            cards={cards}
-            onCardClick={handleCardClick}
-            onCardLike={handleCardLike}
-            onCardDelete={handleCardDelete}
-          />
-          <Footer />
+        <Switch>
+          <Route path="/signin">
+            {loggedIn ? (
+              <Redirect to="/" />
+            ) : (
+              <Login handleAuthorize={handleAuthorize} />
+            )}
+          </Route>
+          <Route path="/signup">
+            {loggedIn ? (
+              <Redirect to="/" />
+            ) : (
+              <Register handleRegister={handleRegister} />
+            )}
+          </Route>
+          <ProtectedRoute path="/" loggedIn={loggedIn}>
+            <Header
+              email={email}
+              onLogout={onLogout}
+              loggedIn={loggedIn}
+              headerText="Log out"
+              headerLink="/signin"
+            />
+            <Main
+              onEditAvatarClick={handleEditAvatarClick}
+              onEditProfileClick={handleEditProfileClick}
+              onAddPlaceClick={handleAddPlaceClick}
+              cards={cards}
+              onCardClick={handleCardClick}
+              onCardLike={handleCardLike}
+              onCardDelete={handleCardDelete}
+            />
+            <Footer />
 
-          <EditAvatarPopup
-            isOpen={editAvatarOpen}
-            onClose={handleCloseAllPopups}
-            onUpdateAvatar={handleUpdateAvatar}
-          />
-          <EditProfilePopup
-            isOpen={editProfileOpen}
-            onClose={handleCloseAllPopups}
-            onUpdateUser={handleUpdateUser}
-          />
-          <AddPlacePopup
-            isOpen={addPlaceOpen}
-            onClose={handleCloseAllPopups}
-            onAddPlace={handleAddPlace}
-          />
+            <EditAvatarPopup
+              isOpen={editAvatarOpen}
+              onClose={handleCloseAllPopups}
+              onUpdateAvatar={handleUpdateAvatar}
+            />
+            <EditProfilePopup
+              isOpen={editProfileOpen}
+              onClose={handleCloseAllPopups}
+              onUpdateUser={handleUpdateUser}
+            />
+            <AddPlacePopup
+              isOpen={addPlaceOpen}
+              onClose={handleCloseAllPopups}
+              onAddPlace={handleAddPlace}
+            />
 
-          <ImagePopup
-            card={selectedCard}
-            isOpen={imagePopupOpen}
-            onClose={closeAllPopups}
-          />
+            <ImagePopup
+              card={selectedCard}
+              isOpen={imagePopupOpen}
+              onClose={closeAllPopups}
+            />
 
-          <PopupWithForm
-            name="delete-card"
-            title="Are you sure?"
-            buttonText="Yes"
-          />
-        </ProtectedRoute>
-        <Route path="/">
-          {loggedIn ? <Redirect to="/" /> : <Redirect to="/signin" />}
-        </Route>
+            <PopupWithForm
+              name="delete-card"
+              title="Are you sure?"
+              buttonText="Yes"
+            />
+          </ProtectedRoute>
+          <Route path="/">
+            {loggedIn ? <Redirect to="/" /> : <Redirect to="/signin" />}
+          </Route>
+        </Switch>
         <InfoTooltip
           isOpen={openTooltip}
           isRegistered={isRegistered}

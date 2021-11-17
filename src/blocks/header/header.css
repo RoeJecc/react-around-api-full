@@ -7,11 +7,17 @@
     display: flex;
     width: auto;
     justify-content: space-between;
+    align-items: flex-start;
+    height: 74px;
 }
 
 .header__container{
-    display: flex;
+    margin: 0;
+    padding: 0;
     height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .header__logout{
@@ -36,6 +42,11 @@
     line-height: 22px;
     padding-right: 24px;
     margin: 0;
+}
+
+.logo{
+    position: relative;
+    align-content: flex-start;
 }
 
 @media screen and (max-width: 900px){

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import Header from "./Header";
 import logo from "../images/Vector.svg";
 
 function Register(props) {
@@ -31,12 +32,7 @@ function Register(props) {
 
   return (
     <div className="login">
-      <div className="login__container">
-        <img src={logo} alt="logo" className="logo" />
-        <Link to="/signin" className="login__link">
-          Log in
-        </Link>
-      </div>
+      <Header headerText="Log In" headerLink="/signin" />
       <form action="#" className="login__form" onSubmit={handleSubmit}>
         <p className="login__title">Sign up</p>
         <input
