@@ -17,7 +17,6 @@ import api from "../utils/api.js";
 import PopupWithForm from "./PopupWithForm.js";
 import CurrentUserContext from "../contexts/CurrentUserContext.js";
 import { checkToken, authorize, register } from "../utils/auth";
-import { permittedCrossDomainPolicies } from "helmet";
 
 function App() {
   const history = useHistory();

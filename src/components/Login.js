@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "./Header";
-import logo from "../images/Vector.svg";
 
 function Login(props) {
   const [email, setEmail] = useState("");

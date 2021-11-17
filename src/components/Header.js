@@ -23,7 +23,7 @@ function Header({
         <Link
           className="header__logout"
           to={headerLink}
-          onClick={loggedIn ? logout : ""}
+          onClick={loggedIn ? logout : null}
         >
           {headerText}
         </Link>

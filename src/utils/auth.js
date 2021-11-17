@@ -19,7 +19,6 @@ export const register = (password, email) => {
     .then((res) => {
         return checkServerResponse(res);
     })
-    .then(res => res.json())
 };
 
 export const authorize = (password, email) => {
@@ -34,7 +33,6 @@ export const authorize = (password, email) => {
     .then((res) => {
         return checkServerResponse(res);
     })
-    .then(res => res.json())
 };
 
 export const checkToken = (token) => {
@@ -49,5 +47,4 @@ export const checkToken = (token) => {
     .then((res) => {
         return checkServerResponse(res);
     })
-    .then(res => res.json())
 }
