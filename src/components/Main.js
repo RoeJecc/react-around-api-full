@@ -20,7 +20,7 @@ function Main({
           <img
             className="profile__avatar"
             src={currentUser ? currentUser.avatar : ""}
-            alt="Cousteau Image"
+            alt="Cousteau"
             id="cousteau-image"
           />
           <div className="profile__overlay">

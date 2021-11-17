@@ -15,7 +15,7 @@ function ImagePopup(props) {
         <figure className="modal__image-container">
           <img
             className="modal__image"
-            alt="Picture"
+            alt="Card Link"
             src={props.card ? props.card.link : "#"}
           />
           <figcaption className="modal__image-caption">
