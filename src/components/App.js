@@ -33,24 +33,46 @@ function App() {
   const [cards, setCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [token, setToken] = useState('');
+  const [show, setShow] = useState(true);
 
   React.useEffect(() => {
+    if(token) {
     api
-      .getInitialCards()
+      .getInitialCards(token)
       .then((res) => {
         setCards(res);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }
+}, [token]);
 
   React.useEffect(() => {
+    if(token) {
     api
-      .getUserInfo()
+      .getUserInfo(token)
       .then((res) => {
         setCurrentUser(res);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }
+}, [token]);
+
+  React.useEffect(() => {
+    if (token) {
+      return checkToken(token)
+        .then(({ data }) => {
+          if (data) {
+            setLoggedIn(true);
+            setEmail(data.email);
+            return;
+          }
+          setLoggedIn(false);
+        })
+        .catch((err) => console.log(err));
+    }
+    setLoggedIn(false);
+  }, [token]);
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
@@ -142,6 +164,7 @@ function App() {
   }
 
   function handleRegister(password, email) {
+    setShow(false);
     return register(password, email)
       .then((res) => {
         if (res.data) {
@@ -162,10 +185,12 @@ function App() {
   }
 
   function handleAuthorize(password, email) {
+    setShow(false);
     authorize(password, email)
       .then(({ token }) => {
         if (token) {
-          localStorage.setItem("jwt", token);
+          localStorage.setItem("token", token);
+          setToken(token);
           setLoggedIn(true);
           setEmail(email);
           return;
@@ -173,7 +198,8 @@ function App() {
         setIsRegistered(false);
         toggleTooltip();
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setShow(true));
   }
 
   function onLogout() {
@@ -193,23 +219,6 @@ function App() {
     document.addEventListener("keydown", closeByEscape);
 
     return () => document.removeEventListener("keydown", closeByEscape);
-  }, []);
-
-  React.useEffect(() => {
-    const jwt = localStorage.getItem("jwt");
-    if (jwt) {
-      return checkToken(jwt)
-        .then(({ data }) => {
-          if (data) {
-            setLoggedIn(true);
-            setEmail(data.email);
-            return;
-          }
-          setLoggedIn(false);
-        })
-        .catch((err) => console.log(err));
-    }
-    setLoggedIn(false);
   }, []);
 
   return (

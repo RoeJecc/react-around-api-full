@@ -1,10 +1,10 @@
-const BASE_URL = 'https://register.nomoreparties.co';
+const BASE_URL = 'http://localhost:3001';
 
 function checkServerResponse(res) {
     if (res.ok) {
       return res.json();
     }
-    return Promise.reject(`Error: ${res.status}`);
+    return Promise.reject('Error' + res.statusText);
   }
 
 export const register = (password, email) => {
@@ -32,6 +32,12 @@ export const authorize = (password, email) => {
     })
     .then((res) => {
         return checkServerResponse(res);
+    })
+    .then((data) => {
+        if (data.token) {
+            localStorage.setItem('jwt', data.token);
+            return data;
+        } return;
     })
 };
 
