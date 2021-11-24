@@ -1,0 +1,40 @@
+{
+  "name": "around-express",
+  "version": "1.0.0",
+  "description": "`/data` — JSON files to temporarily emulate database integration.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "lint": "npx eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RoeJecc/around-express.git"
+  },
+  "author": "Joe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RoeJecc/around-express/issues"
+  },
+  "homepage": "https://github.com/RoeJecc/around-express#readme",
+  "devDependencies": {
+    "eslint": "^8.1.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.25.2",
+    "nodemon": "^2.0.14"
+  },
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "celebrate": "^15.0.0",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-winston": "^4.2.0",
+    "helmet": "^4.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.0.12",
+    "validator": "^13.7.0",
+    "winston": "^3.3.3"
+  }
+}
