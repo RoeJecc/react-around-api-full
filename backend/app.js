@@ -1,4 +1,3 @@
-require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
@@ -11,6 +10,7 @@ const { celebrate, Joi, errors, isCelebrateError } = require("celebrate");
 const { requestLogger, errorLogger } = require("./middleware/logger");
 const validateUrl = require("./middleware/validateUrl");
 const { createUser, login } = require("./controllers/userController");
+require("dotenv").config();
 
 const { PORT = 3000 } = process.env;
 
