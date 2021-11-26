@@ -33,7 +33,7 @@ class Api {
     });
   }
 
-  getAppInfo() {
+  getAppInfo(token) {
     return Promise.all([this.getUserInfo(token), this.getInitialCards(token)]);
   }
 
@@ -105,7 +105,7 @@ class Api {
     });
   }
 
-  setUserAvatar(avatar) {
+  setUserAvatar(avatar, token) {
     return fetch(this._baseUrl + '/users/me/avatar/', { 
       headers: {
           'Content-Type': 'application/json',
