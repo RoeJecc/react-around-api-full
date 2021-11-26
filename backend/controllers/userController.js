@@ -8,46 +8,36 @@ const AuthenticationError = require("../errors/authentication-error");
 const ConflictError = require("../errors/conflict-error");
 const User = require("../models/user");
 
-dotenv.config();
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 function getUsers(req, res, next) {
   User.find({})
-    .select("+password")
     .then((users) => res.status(200).send({ data: users }))
     .catch(next);
 }
 
 function getUserById(req, res, next) {
-  User.findById(req.params.id === "me" ? req.user._id : req.params.id)
-    .select("+password")
+  User.findById(req.params.id)
     .then((user) => {
-      if (user) {
-        res.send({ data: user });
-      }
-      throw new NotFoundError("User not found.");
-    })
-    .catch((err) => {
-      if (err.name === "CastError" || err.name === "TypeError") {
+      if (!user) {
         throw new NotFoundError("User not found.");
+      } else {
+        return res.status(200).send({ user });
       }
-      next(err);
     })
-    .catch(next);
+    .catch(next)
 }
 
 const getCurrentUser = (req, res, next) => {
-  User.findById(req.params.id === "me" ? req.user._id : req.params.id)
-    .select("+password")
+  User.findById(req.user._id)
     .then((user) => {
-      if (user) {
-        res.send({ data: user });
+      if (!user) {
+        throw new NotFoundError("User not found");
       } else {
-        throw new NotFoundError("User not found.");
+        return res.status(200).send({ user });
       }
-      next(err);
     })
-    .catch(next);
+    .catch(console.log(req), next);
 };
 
 function createUser(req, res, next) {
@@ -83,35 +73,32 @@ function createUser(req, res, next) {
 
 function updateUser(req, res, next) {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(
-    { _id: req.user._id },
-    { $set: { name, about } },
+  User.findByIdAndUpdate(req.user._id,
+    { name, about },
     { new: true, runValidators: true }
   )
-    .select("+password")
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        throw new BadRequestError("Unable to update user.");
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('User not found.');
+      } else {
+        res.status(200).send({ data: user })
       }
-      next(err);
     })
     .catch(next);
 }
 
 function updateAvatar(req, res, next) {
-  User.findByIdAndUpdate(
-    { _id: req.user._id },
-    { avatar: req.body.avatar },
-    { new: true, runValidators: true }
-  )
-    .select("+password")
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        throw new BadRequestError("Unable to update avatar.");
+  const { avatar } = req.body;
+
+  User.findByIdAndUpdate(req.user._id,
+    { avatar },
+    { new: true, runValidators: true })
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('User not found.');
+      } else {
+        res.status(200).send({ data: user });
       }
-      next(err);
     })
     .catch(next);
 }
