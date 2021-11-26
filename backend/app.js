@@ -24,7 +24,7 @@ const cardsRouter = require("./routes/cards");
 app.use(express.json());
 app.use(helmet());
 app.use(cors());
-app.options('*', cors());
+app.options("*", cors());
 app.use(requestLogger);
 app.use(errorLogger);
 app.use(errors());
