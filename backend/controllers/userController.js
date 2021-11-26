@@ -2,10 +2,10 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 
-const BadRequestError = require('../errors/bad-request-error');
-const NotFoundError = require('../errors/not-found-error');
-const AuthenticationError = require('../errors/authentication-error');
-const ConflictError = require('../errors/conflict-error');
+const BadRequestError = require("../errors/bad-request-error");
+const NotFoundError = require("../errors/not-found-error");
+const AuthenticationError = require("../errors/authentication-error");
+const ConflictError = require("../errors/conflict-error");
 const User = require("../models/user");
 
 dotenv.config();
@@ -14,7 +14,7 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 function getUsers(req, res, next) {
   User.find({})
     .select("+password")
-    .then((users) => res.send({ data: users }))
+    .then((users) => res.status(200).send({ data: users }))
     .catch(next);
 }
 
@@ -50,9 +50,15 @@ const getCurrentUser = (req, res, next) => {
     .catch(next);
 };
 
-function createUser(req, res) {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar, email, password });
+function createUser(req, res, next) {
+  const { name, about, avatar, email, password } = req.body;
+
+  User.findOne({ email }).then((userExists) => {
+    if (userExists) {
+      throw new ConflictError("User already exists.");
+    }
+  });
+
   bcrypt
     .hash(password, 10)
     .then((hash) =>
@@ -64,14 +70,13 @@ function createUser(req, res) {
         password: hash,
       })
     )
-    .then((user) => res.status(201).send({ _id: user._id }))
+    .then((user) => res.send({ _id: user._id, email: user.email }))
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        throw new BadRequestError("Unable to create user.");
-      } else if (err.name === "MongoError") {
-        throw new ConflictError("User already exists.");
+      if (err.name === "MongoError" && err.code === 11000) {
+        throw new BadRequestError("User already exists.");
+      } else {
+        next(err);
       }
-      next(err);
     })
     .catch(next);
 }
@@ -113,28 +118,18 @@ function updateAvatar(req, res, next) {
 
 function login(req, res, next) {
   const { email, password } = req.body;
-  User.findOne({ email })
-    .select("+password")
+
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
-        throw new AuthenticationError("Incorrect email or password.");
-      } else {
-        req._id = user._id;
-        return bcrypt.compare(password, user.password);
-      }
-    })
-    .then((matched) => {
-      if (!matched) {
-        throw new AuthenticationError("Incorrect email or password.");
+        throw new AuthorizationError("Not Authorized");
       }
       const token = jwt.sign(
-        { _id: req._id },
-        NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
+        { _id: user._id },
+        NODE_ENV === "production" ? JWT_SECRET : "super-secret-key",
         { expiresIn: "7d" }
       );
-      res.header("authorization", `Bearer ${token}`);
-      res.cookie("token", token, { httpOnly: true });
-      res.status(200).send({ token });
+      res.send({ token });
     })
     .catch(next);
 }
