@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
+
 const AuthenticationError = require('../errors/authentication-error');
 
-dotenv.config();
+
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-module.exports = (req, res, next) => {
+const auth = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
@@ -18,7 +18,7 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(
       token,
-      NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret'
+      NODE_ENV === 'production' ? JWT_SECRET : 'super-secret-key'
     );
   } catch (err) {
     throw new AuthenticationError('Authentication Required.')
@@ -26,3 +26,5 @@ module.exports = (req, res, next) => {
   req.user = payload;
   next();
 };
+
+module.exports = auth;
