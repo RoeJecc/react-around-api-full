@@ -28,8 +28,7 @@ app.options("*", cors());
 app.use(requestLogger);
 app.use(errorLogger);
 app.use(errors());
-app.use("/", usersRouter);
-app.use("/", cardsRouter);
+
 
 
 app.get("/crash-test", () => {
@@ -64,6 +63,8 @@ app.post(
 );
 
 app.use(auth);
+app.use("/", usersRouter);
+app.use("/", cardsRouter);
 
 app.get("*", () => {
   throw new NotFoundError("Requested resource not found.");
