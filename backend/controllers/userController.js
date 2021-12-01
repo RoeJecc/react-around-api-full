@@ -106,7 +106,7 @@ function updateAvatar(req, res, next) {
 function login(req, res, next) {
   const { password, email } = req.body;
 
-  return User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(password, email)
     .then((user) => {
       if (!user) {
         throw new AuthorizationError("Not Authorized");
