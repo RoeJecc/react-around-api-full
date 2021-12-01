@@ -25,7 +25,7 @@ function getUserById(req, res, next) {
         return res.status(200).send({ user });
       }
     })
-    .catch(next)
+    .catch(next);
 }
 
 const getCurrentUser = (req, res, next) => {
@@ -51,8 +51,7 @@ function createUser(req, res, next) {
 
   bcrypt
     .hash(password, 10)
-    .then((hash) =>
-      User.create({
+    .then((hash) => User.create({
         name,
         about,
         avatar,
@@ -60,7 +59,7 @@ function createUser(req, res, next) {
         password: hash,
       })
     )
-    .then((user) => res.send({ _id: user._id, email: user.email }))
+    .then((user) => res.status(200).send({ _id: user._id, email: user.email }))
     .catch((err) => {
       if (err.name === "MongoError" && err.code === 11000) {
         throw new BadRequestError("User already exists.");
@@ -73,15 +72,16 @@ function createUser(req, res, next) {
 
 function updateUser(req, res, next) {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id,
+  User.findByIdAndUpdate(
+    req.user._id,
     { name, about },
     { new: true, runValidators: true }
   )
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('User not found.');
+        throw new NotFoundError("User not found.");
       } else {
-        res.status(200).send({ data: user })
+        res.status(200).send({ data: user });
       }
     })
     .catch(next);
@@ -90,12 +90,14 @@ function updateUser(req, res, next) {
 function updateAvatar(req, res, next) {
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate(req.user._id,
+  User.findByIdAndUpdate(
+    req.user._id,
     { avatar },
-    { new: true, runValidators: true })
+    { new: true, runValidators: true }
+  )
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('User not found.');
+        throw new NotFoundError("User not found.");
       } else {
         res.status(200).send({ data: user });
       }
