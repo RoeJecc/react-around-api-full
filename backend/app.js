@@ -30,7 +30,7 @@ app.use(errorLogger);
 app.use(errors());
 app.use("/", usersRouter);
 app.use("/", cardsRouter);
-app.use(auth);
+
 
 app.get("/crash-test", () => {
   setTimeout(() => {
@@ -62,6 +62,8 @@ app.post(
   }),
   createUser
 );
+
+app.use(auth);
 
 app.get("*", () => {
   throw new NotFoundError("Requested resource not found.");
