@@ -1,4 +1,6 @@
 const Card = require('../models/card');
+const dotenv = require("dotenv");
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 function getCards(req, res) {
   Card.find({})
