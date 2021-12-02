@@ -127,7 +127,6 @@ function login(req, res, next) {
         { expiresIn: "7d" }
       );
       res.header("authorization", `Bearer ${token}`);
-      res.cookie("token", token);
       res.status(200).send({ token });
     })
     .catch(next);

@@ -25,6 +25,8 @@ app.use(express.json());
 app.use(helmet());
 app.use(cors());
 app.options("*", cors());
+app.use(express.json({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
 app.use(errorLogger);
 app.use(errors());
@@ -62,9 +64,9 @@ app.post(
   createUser
 );
 
-app.use(auth);
 app.use("/", usersRouter);
 app.use("/", cardsRouter);
+app.use(auth);
 
 app.get("*", () => {
   throw new NotFoundError("Requested resource not found.");
