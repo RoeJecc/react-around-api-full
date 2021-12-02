@@ -18,7 +18,7 @@ const auth = (req, res, next) => {
   try {
     payload = jwt.verify(
       token,
-      NODE_ENV === 'production'
+      NODE_ENV === 'production' ? JWT_SECRET : 'super-secret-key'
     );
   } catch (err) {
     throw new AuthenticationError('Authentication Required.')
