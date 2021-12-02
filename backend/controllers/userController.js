@@ -95,10 +95,10 @@ function updateAvatar(req, res, next) {
     { new: true, runValidators: true }
   )
     .select("+password")
-    .then((user) => res.send({ data: user}))
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        throw new BadRequestError('Unable to update avatar.');
+      if (err.name === "ValidationError") {
+        throw new BadRequestError("Unable to update avatar.");
       }
       next(err);
     })
@@ -108,29 +108,29 @@ function updateAvatar(req, res, next) {
 function login(req, res, next) {
   const { password, email } = req.body;
   User.findOne({ email })
-  .select('+password')
-  .then((user) => {
-    if (!user) {
-      throw new AuthenticationError('Incorrect email or password.');
-    } else {
-      req._id = user._id;
-      return bcrypt.compare(password, user.password);
-    }
-  })
-  .then((matched) => {
-    if (!matched) {
-      throw new AuthenticationError('Incorrect email or password.');
-    }
-    const token = jwt.sign(
-      { _id: req._id },
-      NODE_ENV === 'production',
-      { expiresIn: '7d' }
-    );
-    res.header('authorization', `Bearer ${token}`);
-    res.cookie('token', token, { httpOnly: true });
-    res.status(200).send({ token });
-  })
-  .catch(next);
+    .select("+password")
+    .then((user) => {
+      if (!user) {
+        throw new AuthenticationError("Incorrect email or password.");
+      } else {
+        req._id = user._id;
+        return bcrypt.compare(password, user.password);
+      }
+    })
+    .then((matched) => {
+      if (!matched) {
+        throw new AuthenticationError("Incorrect email or password.");
+      }
+      const token = jwt.sign(
+        { _id: req._id },
+        NODE_ENV === "production" ? JWT_SECRET : "super-secret-key",
+        { expiresIn: "7d" }
+      );
+      res.header("authorization", `Bearer ${token}`);
+      res.cookie("token", token);
+      res.status(200).send({ token });
+    })
+    .catch(next);
 }
 
 module.exports = {
