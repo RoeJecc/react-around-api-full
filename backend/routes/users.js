@@ -8,12 +8,13 @@ const {
   updateUser,
   updateAvatar,
   getCurrentUser,
+  createUser,
 } = require("../controllers/userController");
 
-router.get("/", getUsers);
+router.get("/users", getUsers);
 
 router.get(
-  "/me",
+  "/users/me",
   celebrate({
     body: Joi.object().keys({
       email: Joi.string().required().email(),
@@ -23,7 +24,7 @@ router.get(
 );
 
 router.get(
-  "/:id",
+  "/users/:id",
   celebrate({
     params: Joi.object().keys({
       _id: Joi.string().hex().length(24).required(),
@@ -32,9 +33,10 @@ router.get(
   getUserById
 );
 
+router.post('/users', createUser);
 
 router.patch(
-  "/me",
+  "/users/me",
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().required().min(2).max(30),
@@ -45,7 +47,7 @@ router.patch(
 );
 
 router.patch(
-  "/me/avatar",
+  "/users/me/avatar",
   celebrate({
     body: Joi.object().keys({
       avatar: Joi.string().required().uri(),

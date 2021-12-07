@@ -36,7 +36,7 @@ const getCurrentUser = (req, res, next) => {
     .select("+password")
     .then((user) => {
       if (user) {
-        res.send({ user });
+        res.send({ data: user });
       } else {
         throw new NotFoundError("User not found.");
       }
