@@ -1,20 +1,13 @@
 const Card = require('../models/card');
 
-function getCards(req, res) {
+//see if this works
+function getCards(req, res, next) {
   Card.find({})
-    .then((card) => res.status(200).send({ data: card }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Invalid Data.' });
-      } else if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Card not found.' });
-      } else {
-        res.status(500).send({ message: 'Internal Server Error.' });
-      }
-    });
+    .then((cards) => res.status(200).send({ data: cards }))
+    .catch(next);
 }
 
-function createCard(req, res) {
+function createCard(req, res, next) {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(200).send(card))
@@ -25,7 +18,7 @@ function createCard(req, res) {
     });
 }
 
-function deleteCard(req, res) {
+function deleteCard(req, res, next) {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
