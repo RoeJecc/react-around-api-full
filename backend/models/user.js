@@ -19,9 +19,7 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     validate: {
-      validator(v) {
-        return RegExp(/https?:\/\/(www\.)?[\w\][/.~:?%#@!$&'()*+,;=-]+\..+/).test(v);
-      },
+      validator: (v) => validator.isURL(v),
       message: (props) => `${props.value} is not a valid URL`,
     },
     default: 'https://pictures.s3.yandex.net/resources/avatar_1604080799.jpg'
@@ -39,10 +37,30 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     select: false,
-    minlength: 8,
-    select: false,
   },
 });
+
+userSchema.statics.findUserByCredentials = function findUserByCredentials(
+  email,
+  password,
+) {
+  return this.findOne({ email })
+    .select('+password')
+    .then((user) => {
+      if (!user) {
+        throw new AuthorizationError('Incorrect email or password');
+      }
+
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            throw new AuthorizationError('Incorrect email or password');
+          }
+
+          return user;
+        });
+    });
+};
 
 
 module.exports = mongoose.model('user', userSchema);

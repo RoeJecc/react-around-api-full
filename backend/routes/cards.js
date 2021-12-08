@@ -1,6 +1,7 @@
 const express = require("express");
 const { celebrate, Joi } = require("celebrate");
 const router = express.Router();
+const validateUrl = require('../middleware/validateUrl');
 
 const {
   getCards,
@@ -10,36 +11,41 @@ const {
   unlikeCard,
 } = require("../controllers/cardsController");
 
-router.get("/cards", getCards);
+router.get("/", getCards);
 
 router.post(
-  "/cards",
+  "/",
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().required().min(2).max(30),
-      link: Joi.string().required().uri(),
+      link: Joi.string().required().custom(validateUrl),
     }),
   }),
   createCard
 );
 
-router.delete("/cards/:cardId", deleteCard);
-
-router.put(
-  "/cards/:cardId/likes",
+router.delete('/:id',
   celebrate({
     params: Joi.object().keys({
-      cardId: Joi.string().hex().length(24).required(),
+      id: Joi.string().hex().length(24),
+    }),
+  }), deleteCard);
+
+router.put(
+  "/likes/:id",
+  celebrate({
+    params: Joi.object().keys({
+      id: Joi.string().hex().length(24).required(),
     }),
   }),
   likeCard
 );
 
 router.delete(
-  "/cards/:cardId/likes",
+  "/likes/:id",
   celebrate({
     params: Joi.object().keys({
-      cardId: Joi.string().hex().length(24).required(),
+      id: Joi.string().hex().length(24).required(),
     }),
   }),
   unlikeCard

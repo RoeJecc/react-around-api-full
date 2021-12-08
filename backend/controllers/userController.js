@@ -13,121 +13,120 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 
 function getUsers(req, res, next) {
   User.find({})
-    .select("+password")
     .then((users) => res.status(200).send({ data: users }))
     .catch(next);
 }
 
 function getUserById(req, res, next) {
-  User.findById(req.params.id === "me" ? req.user._id : req.params.id)
-    .select("+password")
+  User.findById(req.params.id)
     .then((user) => {
-      if (user) {
-        res.send({ data: user });
-      } else {
+      if (!user) {
         throw new NotFoundError("User not found.");
+      } else {
+        res.status(200).send({ data: user });
       }
     })
     .catch(next);
 }
 
 const getCurrentUser = (req, res, next) => {
-  User.findById(req.params.id === "me" ? req.user._id : req.params.id)
-    .select("+password")
+  User.findById(req.user._id)
     .then((user) => {
-      if (user) {
-        res.send({ data: user });
-      } else {
+      if (!user) {
         throw new NotFoundError("User not found.");
+      } else {
+        res.status(200).send({ user });
       }
-      next(err);
     })
     .catch(next);
 };
 
 function createUser(req, res, next) {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar, email, password });
-  bcrypt
-    .hash(password, 10)
-    .then((hash) =>
-      User.create({
-        name,
-        about,
-        avatar,
-        email,
-        password: hash,
-      })
-    )
-    .then((user) => res.status(201).send({ _id: user._id }))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        throw new BadRequestError("Unable to create user.");
-      } else if (err.name === "MongoError") {
+  const { name, about, avatar, email, password } = req.body;
+
+  User.findOne({ email })
+    .then((userExists) => {
+      if (userExists) {
         throw new ConflictError("User already exists.");
       }
-      next(err);
+
+      bcrypt
+        .hash(password, 10)
+        .then((hash) =>
+          User.create({
+            name,
+            about,
+            avatar,
+            email,
+            password: hash,
+          })
+        )
+        .then((user) =>
+          res.status(200).send({
+            _id: user._id,
+            email: user.email,
+          })
+        );
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "MongoError" && err.code === 11000) {
+        throw new ConflictError("User already exists.");
+      } else {
+        next(err);
+      }
+    });
 }
 
 function updateUser(req, res, next) {
   const { name, about } = req.body;
+
   User.findByIdAndUpdate(
-    { _id: req.user._id },
-    { $set: { name, about } },
+    req.user._id,
+    { name, about },
     { new: true, runValidators: true }
   )
-    .select("+password")
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        throw new BadRequestError("Unable to update user.");
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError("User does not exist.");
+      } else {
+        res.status(200).send({ data: user });
       }
     })
     .catch(next);
 }
 
 function updateAvatar(req, res, next) {
+  const { avatar } = req.body;
+
   User.findByIdAndUpdate(
-    { _id: req.user._id },
-    { avatar: req.body.avatar },
+    req.user._id,
+    { avatar },
     { new: true, runValidators: true }
   )
-    .select("+password")
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        throw new BadRequestError("Unable to update avatar.");
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError("User does not exist");
+      } else {
+        res.status(200).send({ data: user });
       }
-      next(err);
     })
     .catch(next);
 }
 
 function login(req, res, next) {
-  const { password, email } = req.body;
-  User.findOne({ email })
-    .select("+password")
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
-        throw new AuthenticationError("Incorrect email or password.");
-      } else {
-        req._id = user._id;
-        return bcrypt.compare(password, user.password);
-      }
-    })
-    .then((matched) => {
-      if (!matched) {
-        throw new AuthenticationError("Incorrect email or password.");
+        throw new AuthorizationError("Not Authorized");
       }
       const token = jwt.sign(
-        { _id: req._id },
+        { _id: user._id },
         NODE_ENV === "production" ? JWT_SECRET : "super-secret-key",
         { expiresIn: "7d" }
       );
-      res.header("authorization", `Bearer ${token}`);
-      res.status(200).send({ token });
+      res.send({ token });
     })
     .catch(next);
 }
