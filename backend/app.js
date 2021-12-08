@@ -23,14 +23,12 @@ const cardsRouter = require("./routes/cards");
 
 app.use(express.json());
 app.use(helmet());
-app.use(cors('*'));
+app.use(cors("*"));
 app.use(express.json({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
 app.use(errorLogger);
 app.use(errors());
-
-
 
 app.get("/crash-test", () => {
   setTimeout(() => {
@@ -53,11 +51,11 @@ app.post(
   "/signup",
   celebrate({
     body: Joi.object().keys({
-      name: Joi.string().min(2).max(30).pattern(new RegExp("^[a-zA-Z-\\s]*$")),
+      name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
       avatar: Joi.string().custom(validateUrl),
       email: Joi.string().required().email(),
-      password: Joi.string().min(4).alphanum().required(),
+      password: Joi.string().required(),
     }),
   }),
   createUser
