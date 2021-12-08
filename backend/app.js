@@ -23,8 +23,7 @@ const cardsRouter = require("./routes/cards");
 
 app.use(express.json());
 app.use(helmet());
-app.use(cors());
-app.options("*", cors());
+app.use(cors('*'));
 app.use(express.json({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
