@@ -9,8 +9,7 @@ function getCards(req, res, next) {
 }
 
 function createCard(req, res, next) {
-  const { name, link } = req.body;
-  Card.create({ name, link, owner: req.user._id })
+  Card.create({ name: req.body.name, link: req.body.link, owner: req.user._id })
     .then((card) => res.status(200).send({ data: card }))
     .catch(next);
 }
