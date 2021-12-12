@@ -9,7 +9,7 @@ const ConflictError = require("../errors/conflict-error");
 const User = require("../models/user");
 
 dotenv.config();
-const { NODE_ENV, JWT_SECRET } = process.env;
+const { JWT_SECRET } = process.env;
 
 function getUsers(req, res, next) {
   User.find({})
@@ -123,8 +123,7 @@ function login(req, res, next) {
       }
       const token = jwt.sign(
         { _id: user._id },
-        NODE_ENV === "production" ? JWT_SECRET : "super-secret-key",
-        { expiresIn: "7d" }
+        JWT_SECRET,
       );
       res.send({ token });
     })

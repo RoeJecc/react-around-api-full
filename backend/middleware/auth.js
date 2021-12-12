@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const AuthenticationError = require('../errors/authentication-error');
 
 dotenv.config();
-const { NODE_ENV, JWT_SECRET } = process.env;
+const { JWT_SECRET } = process.env;
 
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
@@ -18,7 +18,7 @@ const auth = (req, res, next) => {
   try {
     payload = jwt.verify(
       token,
-      NODE_ENV === 'production' ? JWT_SECRET : 'super-secret-key'
+      JWT_SECRET,
     );
   } catch (err) {
     throw new AuthenticationError('Authentication Required.')
