@@ -2,6 +2,7 @@ const express = require("express");
 const { celebrate, Joi } = require("celebrate");
 const router = express.Router();
 const validateUrl = require('../middleware/validateUrl');
+const auth = require('../middleware/auth');
 
 const {
   getUsers,
@@ -15,11 +16,12 @@ router.get("/", getUsers);
 
 router.get(
   "/me",
-  celebrate({
-    body: Joi.object().keys({
-      email: Joi.string().required().email(),
-    }),
-  }),
+  auth,
+  // celebrate({
+  //   body: Joi.object().keys({
+  //     email: Joi.string().required().email(),
+  //   }),
+  // }),
   getCurrentUser
 );
 

@@ -1,0 +1,63 @@
+@import url(./__vector/header__vector.css);
+
+.header{
+    margin: 45px 200px 36px;
+    padding: 0;
+    border-bottom: 1px solid rgb(84,84,84, .7);
+    display: flex;
+    width: auto;
+    justify-content: space-between;
+    align-items: flex-start;
+    height: 74px;
+}
+
+.header__container{
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.header__logout{
+    background-color: #0000;
+    border: 0;
+    font-weight: normal;
+    font-size: 18px;
+    line-height: 22px;
+    color: #A9A9A9;
+    transition: all .2s;
+    cursor: pointer;
+    height: 22px;
+}
+
+.header__log:hover{
+    color: #FFFF;
+}
+
+.header__email{
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 22px;
+    padding-right: 24px;
+    margin: 0;
+}
+
+.logo{
+    position: relative;
+    align-content: flex-start;
+}
+
+@media screen and (max-width: 900px){
+    .header{
+        margin: 45px 100px 36px;
+    }
+}
+
+@media screen and (max-width: 550px){
+    .header{
+        margin: 28px 0 38px;
+    }
+}
+
