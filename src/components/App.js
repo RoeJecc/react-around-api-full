@@ -17,6 +17,7 @@ import api from "../utils/api.js";
 import PopupWithForm from "./PopupWithForm.js";
 import CurrentUserContext from "../contexts/CurrentUserContext.js";
 import { checkToken, authorize, register } from "../utils/auth";
+import * as auth from "../utils/auth";
 
 function App() {
   const history = useHistory();
@@ -31,34 +32,37 @@ function App() {
   const [email, setEmail] = useState("");
 
   const [cards, setCards] = useState([]);
-  const [selectedCard, setSelectedCard] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [selectedCard, setSelectedCard] = useState({});
+  const [currentUser, setCurrentUser] = useState({});
+  const [token, setToken] = useState(localStorage.getItem("jwt"));
 
   React.useEffect(() => {
-    api
-      .getInitialCards()
-      .then((res) => {
-        setCards(res);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+    if (token) {
+      auth.checkToken(token)
+        .then((res) => {
+          setLoggedIn(true);
+          setEmail(res.user.email);
+          history.push("/");
+          return api.getUserInfo(token);
+        })
+        .then(res => {
+          setCurrentUser(res.user);
+          return api.getInitialCards(token);
+        })
+        .then(res => {
+          setCards(res.data);
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [history, token]);
 
-  React.useEffect(() => {
-    api
-      .getUserInfo()
-      .then((res) => {
-        setCurrentUser(res);
-      })
-      .catch((err) => console.log(err));
-  }, []);
-
-  function handleCardLike(card) {
+  function handleCardLike(card, token) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
     let likeValue;
     if (isLiked === false) {
-      likeValue = api.addLike(card._id);
+      likeValue = api.addLike(card._id, token);
     } else {
-      likeValue = api.removeLike(card._id);
+      likeValue = api.removeLike(card._id, token);
     }
     likeValue
       .then((newCard) => {
@@ -68,9 +72,9 @@ function App() {
       .catch((err) => console.log(err));
   }
 
-  function handleCardDelete(card) {
+  function handleCardDelete(card, token) {
     api
-      .removeCard(card._id)
+      .removeCard(card._id, token)
       .then(() => {
         const cardList = cards.filter((c) => c._id !== card._id);
         setCards(cardList);
@@ -78,9 +82,9 @@ function App() {
       .catch((err) => console.log(err));
   }
 
-  function handleUpdateUser({ name, about }) {
+  function handleUpdateUser({ name, about }, token) {
     api
-      .setUserInfo({ name, about })
+      .setUserInfo({ name, about }, token)
       .then((res) => {
         setCurrentUser(res);
         closeAllPopups();
@@ -88,19 +92,19 @@ function App() {
       .catch((err) => console.log(err));
   }
 
-  function handleUpdateAvatar(avatar) {
+  function handleUpdateAvatar(avatar, token) {
     api
-      .setUserAvatar(avatar)
+      .setUserAvatar(avatar, token)
       .then((res) => {
-        setCurrentUser(res);
-        closeAllPopups();
+        setCurrentUser(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => closeAllPopups());
   }
 
-  function handleAddPlace({ name, link }) {
+  function handleAddPlace({ name, link }, token) {
     api
-      .addCard({ name, link })
+      .addCard({ name, link }, token)
       .then((newCard) => {
         setCards([newCard, ...cards]);
         closeAllPopups();
@@ -142,36 +146,43 @@ function App() {
   }
 
   function handleRegister(password, email) {
-    return register(password, email)
+    if (!password || !email) {
+      return;
+    }
+    auth
+      .register(password, email)
       .then((res) => {
-        if (res.data) {
-          setLoggedIn(true);
-          history.push("/signin");
-          handleAuthorize(password, email);
+        if (res) {
           setIsRegistered(true);
-          setEmail(email);
-          return;
+          toggleTooltip();
+          history.push("/signin");
+        } else {
+          setIsRegistered(false);
+          toggleTooltip();
         }
       })
-      .catch(() => {
-        setIsRegistered(false);
-      })
-      .finally(() => {
-        toggleTooltip();
+      .catch((err) => {
+        console.log(err);
       });
   }
 
   function handleAuthorize(password, email) {
-    authorize(password, email)
-      .then(({ token }) => {
-        if (token) {
-          localStorage.setItem("jwt", token);
+    if (!password || !email) {
+      console.log("no email or password")
+      return;
+    }
+
+    auth
+      .authorize(password, email)
+      .then((data) => {
+        console.log({data});
+        if (data.token) {
+          console.log({token});
+          localStorage.setItem("jwt", data.token);
+          setToken(data.token);
           setLoggedIn(true);
           setEmail(email);
-          return;
         }
-        setIsRegistered(false);
-        toggleTooltip();
       })
       .catch((err) => console.log(err));
   }
@@ -193,23 +204,6 @@ function App() {
     document.addEventListener("keydown", closeByEscape);
 
     return () => document.removeEventListener("keydown", closeByEscape);
-  }, []);
-
-  React.useEffect(() => {
-    const jwt = localStorage.getItem("jwt");
-    if (jwt) {
-      return checkToken(jwt)
-        .then(({ data }) => {
-          if (data) {
-            setLoggedIn(true);
-            setEmail(data.email);
-            return;
-          }
-          setLoggedIn(false);
-        })
-        .catch((err) => console.log(err));
-    }
-    setLoggedIn(false);
   }, []);
 
   return (

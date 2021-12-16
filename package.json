@@ -1,5 +1,5 @@
 {
-  "name": "around-react",
+  "name": "react-around-api-full",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -19,7 +19,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "npm run build && scp -r ./build/* jrecc4@jrecchia.students.nomoreparties.site:/home/jrecc4/react-around-api-full/frontend"
   },
   "eslintConfig": {
     "extends": [
@@ -39,7 +39,6 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "https://roejecc.github.io/around-react/",
   "devDependencies": {
     "gh-pages": "^3.2.3"
   }

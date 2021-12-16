@@ -1,6 +1,6 @@
 class Api {
-  constructor({ baseURL, headers }) {
-    this._baseURL = baseURL;
+  constructor({ baseUrl, headers }) {
+    this._baseUrl = baseUrl;
     this._headers = headers;
   }
 
@@ -8,32 +8,42 @@ class Api {
     if (res.ok) {
       return res.json();
     }
-    return Promise.reject("Error" + res.statusText);
+    return Promise.reject(`Error: ${res.status}`);
   }
 
-  getInitialCards() {
-    return fetch(this._baseURL + "/cards", {
-      headers: this._headers,
+  getInitialCards(token) {
+    return fetch(this._baseUrl + "/cards/", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem(token)}`,
+      },
     }).then((res) => {
       return this._checkServerResponse(res);
     });
   }
 
-  getUserInfo() {
-    return fetch(this._baseURL + "/users/me", {
-      headers: this._headers,
+  getUserInfo(token) {
+    return fetch(this._baseUrl + "/users/me", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem(token)}`,
+      },
     }).then((res) => {
+      console.log("get user info",res.body);
       return this._checkServerResponse(res);
     });
   }
 
-  getAppInfo() {
-    return Promise.all([this.getUserInfo(), this.getInitialCards()]);
+  getAppInfo(token) {
+    return Promise.all([this.getUserInfo(localStorage.getItem(token)), this.getInitialCards(localStorage.getItem(token))]);
   }
 
-  addCard({ name, link }) {
-    return fetch(this._baseURL + "/cards", {
-      headers: this._headers,
+  addCard({ name, link }, token) {
+    return fetch(this._baseUrl + "/cards/", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem(token)}`,
+      },
       method: "POST",
       body: JSON.stringify({
         name,
@@ -44,39 +54,48 @@ class Api {
     });
   }
 
-  removeCard(cardID) {
-    return fetch(this._baseURL + "/cards/" + cardID, {
-      headers: this._headers,
+  removeCard(cardID, token) {
+    return fetch(this._baseUrl + "/cards/" + cardID, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem(token)}`,
+      },
       method: "DELETE",
     }).then((res) => {
       return this._checkServerResponse(res);
     });
   }
 
-  addLike(cardID) {
-    return fetch(this._baseURL + "/cards/likes/" + cardID, {
-      headers: this._headers,
+  addLike(cardID, token) {
+    return fetch(this._baseUrl + "/cards/likes/" + cardID, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem(token)}`,
+      },
       method: "PUT",
     }).then((res) => {
       return this._checkServerResponse(res);
     });
   }
 
-  removeLike(cardID) {
-    return fetch(this._baseURL + "/cards/likes/" + cardID, {
-      headers: this._headers,
+  removeLike(cardID, token) {
+    return fetch(this._baseUrl + "/cards/likes/" + cardID, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem(token)}`,
+      },
       method: "DELETE",
     }).then((res) => {
       return this._checkServerResponse(res);
     });
   }
 
-  setUserInfo({ name, about }) {
-    return fetch(this._baseURL + "/users/me/", {
+  setUserInfo({ name, about }, token) {
+    return fetch(this._baseUrl + "/users/me", {
       method: "PATCH",
       headers: {
-        authorization: "f3cf689f-e903-4b5b-9d77-2b0b4048d455",
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem(token)}`,
       },
       body: JSON.stringify({
         name,
@@ -87,9 +106,12 @@ class Api {
     });
   }
 
-  setUserAvatar(avatar) {
-    return fetch(this._baseURL + "/users/me/avatar/", {
-      headers: this._headers,
+  setUserAvatar(avatar, token) {
+    return fetch(this._baseUrl + "/users/me/avatar", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem(token)}`,
+      },
       method: "PATCH",
       body: JSON.stringify({
         avatar,
@@ -101,11 +123,10 @@ class Api {
 }
 
 const api = new Api({
-    baseURL: "https://around.nomoreparties.co/v1/group-12",
-    headers: {
-      authorization: "f3cf689f-e903-4b5b-9d77-2b0b4048d455",
-      "Content-Type": "application/json",
-    },
-  });
+  baseUrl:
+    process.env.NODE_ENV === "production"
+      ? "https://api.jrecchia.students.nomoreparties.site"
+      : "http://localhost:3000",
+});
 
-  export default api;
+export default api;
