@@ -7,9 +7,11 @@ const { JWT_SECRET } = process.env;
 
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
+  console.log(req.headers);
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    throw new AuthenticationError('Authentication Required.');
+    console.log("token error");
+    //throw new AuthenticationError('Authentication Required.');
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -20,10 +22,11 @@ const auth = (req, res, next) => {
       token,
       JWT_SECRET,
     );
+    console.log('payload good', payload);
   } catch (err) {
-    throw new AuthenticationError('Authentication Required.')
+   // throw new AuthenticationError('Authentication Required.')
   }
-  req.user = payload;
+  req.current_user = payload;
   next();
 };
 

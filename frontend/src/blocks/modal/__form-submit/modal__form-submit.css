@@ -1,0 +1,27 @@
+.modal__form-submit{
+    background-color: black;
+    border: none;
+    color: white;
+    cursor: pointer;
+    margin: 18px 36px 36px;
+    width: calc(100% - 72px);
+    height: 50px;
+    font-size: 18px;
+    line-height: 22px;
+    border-radius: 2px;
+    transition: opacity .4s linear;
+}
+
+.modal__form-submit:hover{
+    opacity: .8;
+    transition: opacity .4s linear;
+}
+
+@media screen and (max-width: 550px){
+    .modal__form-submit{
+        width: calc(100% - 44px);
+        margin: 46px 22px 25px;
+        font-size: 14px;
+        line-height: 17px;
+    }
+}

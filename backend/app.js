@@ -61,26 +61,26 @@ app.post(
   createUser
 );
 
-app.use("/", usersRouter);
+app.use("/users", usersRouter);
 app.use("/", cardsRouter);
-app.use(auth);
 
 app.get("*", () => {
   throw new NotFoundError("Requested resource not found.");
 });
 
-app.use((err, req, res, next) => {
-  if (isCelebrateError(err)) {
-    throw new BadRequestError("Request cannot be completed at this time.");
-  }
-  next(err);
-});
+// app.use((err, req, res, next) => {
+//   if (isCelebrateError(err)) {
+//     throw new BadRequestError("Request cannot be completed at this time.");
+//   }
+//   next(err);
+// });
 
 app.use((err, req, res, next) => {
+  console.error(err);
   const { statusCode = 500, message } = err;
-  if (isCelebrateError(err)) {
-    throw new ConflictError("User already taken.");
-  }
+  // if (isCelebrateError(err)) {
+  //   throw new ConflictError("User already taken.");
+  // }
   res.status(statusCode).send({
     message: statusCode === 500 ? "An error occurred on the server" : message,
   });
