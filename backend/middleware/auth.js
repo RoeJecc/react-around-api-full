@@ -20,7 +20,7 @@ const auth = (req, res, next) => {
   try {
     payload = jwt.verify(
       token,
-      JWT_SECRET,
+      NODE_ENV === 'production' ? JWT_SECRET : 'super-secret-key',
     );
     console.log('payload good', payload);
   } catch (err) {
