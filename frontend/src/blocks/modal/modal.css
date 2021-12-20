@@ -1,0 +1,31 @@
+@import url(./__form-submit/modal__form-submit.css);
+
+@import url(./__text-input/_type/modal__text-input_type_occupation.css);
+@import url(./__profile/modal__profile.css);
+@import url(./__title/modal__title.css);
+@import url(./__close-button/modal__close-button.css);
+@import url(./__container/modal__container.css);
+@import url(./__container/_preview/modal__container_preview.css);
+@import url(./__text-input/modal__text-input.css);
+@import url(./__image/modal__image.css);
+@import url(./__image-container/modal__image-container.css);
+@import url(./__image-caption/modal__image-caption.css);
+@import url(./__text-input/_type/modal__text-input_type_error.css);
+@import url(./__error/modal__error.css);
+@import url(./__form-submit/_disabled/modal__form-submit_disabled.css);
+@import url(./__error/_active/modal__error_active.css);
+@import url(./__text-input/_type/modal__text-input_type_name.css);
+
+.modal{
+    display: flex;
+    background-color: rgb(0, 0, 0 ,.5);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    justify-content: center;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s linear .5s, opacity .4s linear;
+}

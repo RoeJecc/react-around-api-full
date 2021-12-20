@@ -1,0 +1,16 @@
+.modal__container{
+    background-color: white;
+    display: flex;
+    position: relative;
+    width: 430px;
+    color: black;
+    border-radius: 10px;
+    z-index: 1;
+    align-self: center;
+}
+
+@media screen and (max-width: 550px){
+    .modal__container{
+        width: 282px;
+    }
+}

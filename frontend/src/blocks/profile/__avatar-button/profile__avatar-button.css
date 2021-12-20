@@ -1,0 +1,11 @@
+.profile__avatar-button {
+    background-image: url(../../../images/AvatarEdit.svg);
+    background-position: center;
+    background-color: rgb(0, 0, 0, 0);
+    background-repeat: no-repeat;
+    border: none;
+    height: 24px;
+    width: 24px;
+    box-sizing: border-box;
+    cursor: pointer;
+  }

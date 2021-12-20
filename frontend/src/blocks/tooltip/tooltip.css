@@ -1,0 +1,24 @@
+@import url(../tooltip/__container/tooltip__container.css);
+@import url(../tooltip/__success/tooltip__success.css);
+@import url(../tooltip/__error/tooltip__error.css);
+@import url(../tooltip/__text/tooltip__text.css);
+@import url(../tooltip/__close-button/tooltip__close-button.css);
+
+.tooltip {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, .5);
+    opacity: 0;
+    visibility: hidden;
+    transition: all .2s;
+}
+
+.tooltip_visible {
+    opacity: 1;
+    visibility: visible;
+}
