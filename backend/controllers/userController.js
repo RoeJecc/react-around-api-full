@@ -125,7 +125,7 @@ function login(req, res, next) {
         throw new AuthorizationError("Not Authorized");
       }
       const token = jwt.sign(
-        { _id: user._id },
+        { _id: current_user._id },
         JWT_SECRET,
       );
       res.send({ token });
