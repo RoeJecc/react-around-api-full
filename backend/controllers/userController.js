@@ -8,8 +8,8 @@ const AuthenticationError = require("../errors/authentication-error");
 const ConflictError = require("../errors/conflict-error");
 const User = require("../models/user");
 
-dotenv.config();
-const { JWT_SECRET } = process.env;
+
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 function getUsers(req, res, next) {
   User.find({})
@@ -125,8 +125,8 @@ function login(req, res, next) {
         throw new AuthorizationError("Not Authorized");
       }
       const token = jwt.sign(
-        { _id: current_user._id },
-        JWT_SECRET,
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'super-secret-key',
       );
       res.send({ token });
     })
