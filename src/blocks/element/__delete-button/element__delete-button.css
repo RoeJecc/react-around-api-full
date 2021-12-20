@@ -1,0 +1,29 @@
+.element__delete-button{
+    background-image: url(../../../images/TrashVector.svg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: rgb(0, 0, 0, 0);
+    height: 20px;
+    width: 18px;
+    outline: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    align-self: flex-end;
+    justify-self: flex-end;
+    position: absolute;
+    top: 18px;
+    right: 15px;
+    transition: opacity .4s linear;
+    visibility: hidden;
+}
+
+.element__delete-button_active{
+    visibility: visible;
+}
+
+.element__delete-button:hover{
+    opacity: .6;
+    transition: opacity .4s linear;
+}

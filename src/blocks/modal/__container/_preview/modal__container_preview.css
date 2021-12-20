@@ -1,0 +1,6 @@
+.modal__container_preview{
+    justify-content: center;
+    align-content: center;
+    width: fit-content;
+    background-color: rgb( 0, 0, 0, 0);
+}
