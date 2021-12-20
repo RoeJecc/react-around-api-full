@@ -16,7 +16,6 @@ import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import api from "../utils/api.js";
 import PopupWithForm from "./PopupWithForm.js";
 import CurrentUserContext from "../contexts/CurrentUserContext.js";
-import { checkToken, authorize, register } from "../utils/auth";
 import * as auth from "../utils/auth";
 
 function App() {
@@ -38,18 +37,19 @@ function App() {
 
   React.useEffect(() => {
     if (token) {
-      auth.checkToken(token)
+      auth
+        .checkToken(token)
         .then((res) => {
           setLoggedIn(true);
           setEmail(res.user.email);
           history.push("/");
           return api.getUserInfo(token);
         })
-        .then(res => {
+        .then((res) => {
           setCurrentUser(res.user);
           return api.getInitialCards(token);
         })
-        .then(res => {
+        .then((res) => {
           setCards(res.data);
         })
         .catch((err) => console.log(err));
@@ -57,19 +57,31 @@ function App() {
   }, [history, token]);
 
   function handleCardLike(card, token) {
-    const isLiked = card.likes.some((i) => i._id === currentUser._id);
-    let likeValue;
+    const isLiked = card.likes.some((i) => i === currentUser._id);
+
     if (isLiked === false) {
-      likeValue = api.addLike(card._id, token);
+      api
+        .addLike(card._id, token)
+        .then((newCard) => {
+          setCards((state) =>
+            state.map((c) => (c._id === card._id ? newCard : c))
+          );
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     } else {
-      likeValue = api.removeLike(card._id, token);
+      api
+        .removeLike(card._id, token)
+        .then((newCard) => {
+          setCards((state) =>
+            state.map((c) => (c._id === card._id ? newCard : c))
+          );
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-    likeValue
-      .then((newCard) => {
-        const newCards = cards.map((c) => (c._id === card._id ? newCard : c));
-        setCards(newCards);
-      })
-      .catch((err) => console.log(err));
   }
 
   function handleCardDelete(card, token) {
@@ -82,31 +94,33 @@ function App() {
       .catch((err) => console.log(err));
   }
 
-  function handleUpdateUser({ name, about }, token) {
+  function handleUpdateUser({ name, about }) {
     api
       .setUserInfo({ name, about }, token)
       .then((res) => {
-        setCurrentUser(res);
+        setCurrentUser(res.data);
         closeAllPopups();
       })
       .catch((err) => console.log(err));
   }
 
-  function handleUpdateAvatar(avatar, token) {
+  function handleUpdateAvatar(avatar , token) {
     api
-      .setUserAvatar(avatar, token)
+      .setUserAvatar(avatar , token)
       .then((res) => {
         setCurrentUser(res.data);
+        closeAllPopups();
       })
-      .catch((err) => console.log(err))
-      .finally(() => closeAllPopups());
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   function handleAddPlace({ name, link }, token) {
     api
       .addCard({ name, link }, token)
       .then((newCard) => {
-        setCards([newCard, ...cards]);
+        setCards([newCard.data, ...cards]);
         closeAllPopups();
       })
       .catch((err) => console.log(err));
@@ -168,16 +182,16 @@ function App() {
 
   function handleAuthorize(password, email) {
     if (!password || !email) {
-      console.log("no email or password")
+      console.log("no email or password");
       return;
     }
 
     auth
       .authorize(password, email)
       .then((data) => {
-        console.log({data});
+        console.log({ data });
         if (data.token) {
-          console.log({token});
+          console.log({ token });
           localStorage.setItem("jwt", data.token);
           setToken(data.token);
           setLoggedIn(true);
