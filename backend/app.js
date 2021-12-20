@@ -62,7 +62,7 @@ app.post(
 );
 
 app.use("/users", usersRouter);
-app.use("/", cardsRouter);
+app.use("/cards", cardsRouter);
 
 app.get("*", () => {
   throw new NotFoundError("Requested resource not found.");

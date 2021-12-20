@@ -84,7 +84,7 @@ function updateUser(req, res, next) {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(
-    req.user._id,
+    req.current_user._id,
     { name, about },
     { new: true, runValidators: true }
   )
@@ -102,7 +102,7 @@ function updateAvatar(req, res, next) {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(
-    req.user._id,
+    req.current_user._id,
     { avatar },
     { new: true, runValidators: true }
   )
