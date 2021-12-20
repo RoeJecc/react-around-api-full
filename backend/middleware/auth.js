@@ -24,7 +24,7 @@ const auth = (req, res, next) => {
     );
     console.log('payload good', payload);
   } catch (err) {
-   // throw new AuthenticationError('Authentication Required.')
+   return next(new AuthenticationError('Authentication Required.'));
   }
   req.current_user = payload;
   next();

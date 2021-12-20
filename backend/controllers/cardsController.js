@@ -9,7 +9,7 @@ function getCards(req, res, next) {
 }
 
 function createCard(req, res, next) {
-  Card.create({ name: req.body.name, link: req.body.link, owner: req.user._id })
+  Card.create({ name: req.body.name, link: req.body.link, owner: req.current_user._id })
     .then((card) => res.status(200).send({ data: card }))
     .catch(next);
 }
@@ -19,7 +19,7 @@ function deleteCard(req, res, next) {
     .then((card) => {
       if (!card) {
         throw new NotFoundError("Card not found.");
-      } else if (card.owner.toString() !== req.user._id) {
+      } else if (card.owner.toString() !== req.current_user._id) {
         throw new AuthorizationError("Not authorized.");
       }
       res.status(200).send({ data: card });
@@ -30,7 +30,7 @@ function deleteCard(req, res, next) {
 function likeCard(req, res, next) {
   Card.findByIdAndUpdate(
     req.params.id,
-    { $addToSet: { likes: req.user._id } },
+    { $addToSet: { likes: req.current_user._id } },
     { new: true }
   )
     .then((card) => {
@@ -46,14 +46,14 @@ function likeCard(req, res, next) {
 function unlikeCard(req, res, next) {
   Card.findByIdAndUpdate(
     req.params.id,
-    { $pull: { likes: req.user._id } },
+    { $pull: { likes: req.current_user._id } },
     { new: true }
   )
     .then((card) => {
       if (card) {
         res.status(200).send(card);
       }
-      throw new NotFoundError("Card not found.");
+      return next(new NotFoundError("Card not found."));
     })
     .catch(next);
 }
