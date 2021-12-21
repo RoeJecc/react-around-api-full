@@ -30,11 +30,8 @@ function getUserById(req, res, next) {
 }
 
 const getCurrentUser = (req, res, next) => {
-  console.log('getCurrntuser', req.current_user)
-  // console.log({req});
   User.findById(req.current_user._id)
     .then((user) => {
-      console.log('user qeury', user)
       if (!user) {
         throw new NotFoundError("User not found.");
       }

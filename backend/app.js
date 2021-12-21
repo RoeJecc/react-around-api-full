@@ -2,11 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
 const cors = require("cors");
-const auth = require("./middleware/auth");
-const BadRequestError = require("./errors/bad-request-error");
 const NotFoundError = require("./errors/not-found-error");
-const ConflictError = require("./errors/conflict-error");
-const { celebrate, Joi, errors, isCelebrateError } = require("celebrate");
+const { celebrate, Joi, errors } = require("celebrate");
 const { requestLogger, errorLogger } = require("./middleware/logger");
 const validateUrl = require("./middleware/validateUrl");
 const { createUser, login } = require("./controllers/userController");
@@ -68,19 +65,11 @@ app.get("*", () => {
   throw new NotFoundError("Requested resource not found.");
 });
 
-// app.use((err, req, res, next) => {
-//   if (isCelebrateError(err)) {
-//     throw new BadRequestError("Request cannot be completed at this time.");
-//   }
-//   next(err);
-// });
+
 
 app.use((err, req, res, next) => {
   console.error(err);
   const { statusCode = 500, message } = err;
-  // if (isCelebrateError(err)) {
-  //   throw new ConflictError("User already taken.");
-  // }
   res.status(statusCode).send({
     message: statusCode === 500 ? "An error occurred on the server" : message,
   });

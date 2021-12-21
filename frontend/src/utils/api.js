@@ -29,7 +29,6 @@ class Api {
         Authorization: `Bearer ${localStorage.getItem("jwt")}`,
       },
     }).then((res) => {
-      console.log("get user info",res.body);
       return this._checkServerResponse(res);
     });
   }
