@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # react-around-api-full
 The API of "Around the U.S." with authorization and registration handled by the back-end server.
 
@@ -8,10 +7,4 @@ This repository contains the full API of "Around the U.S." project that features
 =======
 Around the U.S. project on React, featuring authorization and registration.
 
-This repository will contain your own front-end project on React with added authorization and registration features.
-Start working with your previously built front end code from Sprint 11.
-
 https://jrecchia.students.nomoreparties.site/
-
-Good luck!
->>>>>>> 671d64176813dcc119942314abe64b97c1630a8a
