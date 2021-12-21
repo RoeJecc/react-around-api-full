@@ -7,11 +7,9 @@ const { JWT_SECRET } = process.env;
 
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
-  console.log(req.headers);
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    console.log("token error");
-    //throw new AuthenticationError('Authentication Required.');
+    return next(new AuthenticationError('Authentication Required.'));
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -22,7 +20,6 @@ const auth = (req, res, next) => {
       token,
       NODE_ENV === 'production' ? JWT_SECRET : 'super-secret-key',
     );
-    console.log('payload good', payload);
   } catch (err) {
    return next(new AuthenticationError('Authentication Required.'));
   }
