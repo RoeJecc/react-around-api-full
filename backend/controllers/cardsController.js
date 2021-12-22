@@ -1,6 +1,7 @@
 const Card = require("../models/card");
 const NotFoundError = require("../errors/not-found-error");
 const AuthorizationError = require("../errors/authentication-error");
+const BadRequestError = require("../errors/bad-request-error");
 
 function getCards(req, res, next) {
   Card.find({})
@@ -9,9 +10,19 @@ function getCards(req, res, next) {
 }
 
 function createCard(req, res, next) {
-  Card.create({ name: req.body.name, link: req.body.link, owner: req.current_user._id })
-    .then((card) => res.status(200).send({ data: card }))
-    .catch(next);
+  Card.create({
+    name: req.body.name,
+    link: req.body.link,
+    owner: req.current_user._id,
+  })
+    .then((card) => res.status(201).send({ data: card }))
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        throw new BadRequestError("Invalid data passed.");
+      } else {
+        next(err);
+      }
+    });
 }
 
 function deleteCard(req, res, next) {
@@ -19,12 +30,18 @@ function deleteCard(req, res, next) {
     .then((card) => {
       if (!card) {
         throw new NotFoundError("Card not found.");
-      } else if (card.owner.toString() !== req.current_user._id) {
+      } else if (!card.owner.toString() === req.current_user._id) {
         throw new AuthorizationError("Not authorized.");
       }
       res.status(200).send({ data: card });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "CastError") {
+        throw new BadRequestError("Invalid data Passed.");
+      } else {
+        next(err);
+      }
+    });
 }
 
 function likeCard(req, res, next) {
@@ -40,7 +57,13 @@ function likeCard(req, res, next) {
         throw new NotFoundError("Card not found.");
       }
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "CastError") {
+        throw new BadRequestError("Invalid data passed.");
+      } else {
+        next(err);
+      }
+    });
 }
 
 function unlikeCard(req, res, next) {
@@ -55,7 +78,13 @@ function unlikeCard(req, res, next) {
       }
       return next(new NotFoundError("Card not found."));
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "CastError") {
+        throw new BadRequestError("Invalid data passed.");
+      } else {
+        next(err);
+      }
+    });
 }
 
 module.exports = {

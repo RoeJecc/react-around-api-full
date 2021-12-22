@@ -8,7 +8,7 @@ const AuthenticationError = require("../errors/authentication-error");
 const ConflictError = require("../errors/conflict-error");
 const User = require("../models/user");
 
-
+dotenv.config();
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 function getUsers(req, res, next) {
@@ -26,7 +26,13 @@ function getUserById(req, res, next) {
         res.status(200).send({ data: user });
       }
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "CastError" || err.name === "TypeError") {
+        throw new BadRequestError("User not found.");
+      } else {
+        next(err);
+      }
+    });
 }
 
 const getCurrentUser = (req, res, next) => {
@@ -35,10 +41,15 @@ const getCurrentUser = (req, res, next) => {
       if (!user) {
         throw new NotFoundError("User not found.");
       }
-        return res.status(200).send({ user });
-
+      return res.status(200).send({ user });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "CastError" || err.name === "TypeError") {
+        throw new BadRequestError("User not found.");
+      } else {
+        next(err);
+      }
+    });
 };
 
 function createUser(req, res, next) {
@@ -62,7 +73,7 @@ function createUser(req, res, next) {
           })
         )
         .then((user) =>
-          res.status(200).send({
+          res.status(201).send({
             _id: user._id,
             email: user.email,
           })
@@ -119,11 +130,11 @@ function login(req, res, next) {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
-        throw new AuthorizationError("Not Authorized");
+        throw new AuthenticationError("Not Authorized");
       }
       const token = jwt.sign(
         { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'super-secret-key',
+        NODE_ENV === "production" ? JWT_SECRET : "super-secret-key"
       );
       res.send({ token });
     })
