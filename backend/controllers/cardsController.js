@@ -28,10 +28,12 @@ function createCard(req, res, next) {
 function deleteCard(req, res, next) {
   Card.findByIdAndRemove(req.params.id)
     .then((card) => {
-      if (!card) {
-        throw new NotFoundError("Card not found.");
+      if (card.owner.toString() === req.user._id) {
+        res.status(200).send({ data: card });
       } else if (card.owner.toString() !== req.user._id) {
         throw new AuthenticationError("Not authorized.");
+      } else if (!card) {
+        throw new NotFoundError("Card not found.");
       }
       res.status(200).send({ data: card });
     })
