@@ -23,7 +23,7 @@ const auth = (req, res, next) => {
   } catch (err) {
    return next(new AuthenticationError('Authentication Required.'));
   }
-  req.current_user = payload;
+  req.user = payload;
   next();
 };
 
