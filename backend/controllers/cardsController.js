@@ -26,7 +26,7 @@ function createCard(req, res, next) {
 }
 
 function deleteCard(req, res, next) {
-  Card.findByIdAndRemove(req.params.cardID)
+  Card.findByIdAndRemove(req.params.id)
     .then((card) => {
       if (!card) {
         throw new NotFoundError("Card not found.");
@@ -46,7 +46,7 @@ function deleteCard(req, res, next) {
 
 function likeCard(req, res, next) {
   Card.findByIdAndUpdate(
-    req.params.cardID,
+    req.params.id,
     { $addToSet: { likes: req.user._id } },
     { new: true }
   )
@@ -68,7 +68,7 @@ function likeCard(req, res, next) {
 
 function unlikeCard(req, res, next) {
   Card.findByIdAndUpdate(
-    req.params.cardID,
+    req.params.id,
     { $pull: { likes: req.user._id } },
     { new: true }
   )
