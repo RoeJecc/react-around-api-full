@@ -104,9 +104,9 @@ function App() {
       .catch((err) => console.log(err));
   }
 
-  function handleUpdateAvatar(avatar , token) {
+  function handleUpdateAvatar(avatar, token) {
     api
-      .setUserAvatar(avatar , token)
+      .setUserAvatar(avatar, token)
       .then((res) => {
         setCurrentUser(res.data);
         closeAllPopups();
