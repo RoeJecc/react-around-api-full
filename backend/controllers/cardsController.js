@@ -1,6 +1,6 @@
 const Card = require("../models/card");
 const NotFoundError = require("../errors/not-found-error");
-const AuthorizationError = require("../errors/authentication-error");
+const AuthenticationError = require("../errors/authentication-error");
 const BadRequestError = require("../errors/bad-request-error");
 
 function getCards(req, res, next) {
@@ -31,7 +31,7 @@ function deleteCard(req, res, next) {
       if (!card) {
         throw new NotFoundError("Card not found.");
       } else if (!card.owner.toString() === req.current_user._id) {
-        throw new AuthorizationError("Not authorized.");
+        throw new AuthenticationError("Not authorized.");
       }
       res.status(200).send({ data: card });
     })
