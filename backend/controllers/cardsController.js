@@ -33,8 +33,12 @@ function deleteCard(req, res, next) {
       } else if (card.owner.toString() !== req.user._id) {
         throw new AuthenticationError("Not authorized.");
       }
-      return Card.deleteOne(req.params.id).catch((err) => {
-        next(err);
+      Card.deleteOne(card).then((card) => {
+        if (card) {
+          return res.status(200).send({ data: card });
+        } else {
+          next(err);
+        }
       });
     })
     .catch((err) => {
