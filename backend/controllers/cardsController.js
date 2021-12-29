@@ -26,14 +26,12 @@ function createCard(req, res, next) {
 }
 
 function deleteCard(req, res, next) {
-  Card.findByIdAndRemove(req.params.id)
+  Card.findByIdAndRemove(req.params.cardID)
     .then((card) => {
-      if (card.owner.toString() === req.user._id) {
-        res.status(200).send({ data: card });
+      if (!card) {
+        throw new NotFoundError("Card not found.");
       } else if (card.owner.toString() !== req.user._id) {
         throw new AuthenticationError("Not authorized.");
-      } else if (!card) {
-        throw new NotFoundError("Card not found.");
       }
       res.status(200).send({ data: card });
     })
@@ -48,7 +46,7 @@ function deleteCard(req, res, next) {
 
 function likeCard(req, res, next) {
   Card.findByIdAndUpdate(
-    req.params.id,
+    req.params.cardID,
     { $addToSet: { likes: req.user._id } },
     { new: true }
   )
@@ -70,7 +68,7 @@ function likeCard(req, res, next) {
 
 function unlikeCard(req, res, next) {
   Card.findByIdAndUpdate(
-    req.params.id,
+    req.params.cardID,
     { $pull: { likes: req.user._id } },
     { new: true }
   )
