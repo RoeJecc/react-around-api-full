@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const AuthenticationError = require('../errors/authentication-error');
 
 dotenv.config();
-const { JWT_SECRET } = process.env;
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
@@ -23,7 +23,7 @@ const auth = (req, res, next) => {
   } catch (err) {
    return next(new AuthenticationError('Authentication Required.'));
   }
-  req.current_user = payload;
+  req.user = payload;
   next();
 };
 
