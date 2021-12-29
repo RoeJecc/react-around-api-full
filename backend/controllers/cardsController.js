@@ -29,15 +29,15 @@ function deleteCard(req, res, next) {
   Card.findByIdAndRemove(req.params.id)
     .then((card) => {
       if (!card) {
-        throw new NotFoundError("Card not found.");
+        return next(new NotFoundError("Card not found."));
       } else if (card.owner.toString() !== req.user._id) {
-        throw new AuthenticationError("Not authorized.");
+        return next(new AuthenticationError("Not authorized."));
       }
-      res.status(200).send({ data: card });
+      return res.status(200).send({ data: card });
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        throw new BadRequestError("Invalid data Passed.");
+        return next(new BadRequestError("Invalid data Passed."));
       } else {
         next(err);
       }
