@@ -26,14 +26,16 @@ function createCard(req, res, next) {
 }
 
 function deleteCard(req, res, next) {
-  Card.findByIdAndRemove(req.params.id)
+  Card.findById(req.params.id)
     .then((card) => {
       if (!card) {
         throw new NotFoundError("Card not found.");
       } else if (card.owner.toString() !== req.user._id) {
         throw new AuthenticationError("Not authorized.");
       }
-      return res.status(200).send({ data: card });
+      return Card.deleteOne(req.params.id).catch((err) => {
+        next(err);
+      });
     })
     .catch((err) => {
       if (err.name === "CastError") {
