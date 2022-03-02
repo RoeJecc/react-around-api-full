@@ -7,4 +7,4 @@ This repository contains the full API of "Around the U.S." project that features
 =======
 Around the U.S. project on React, featuring authorization and registration.
 
-https://jrecchia.students.nomoreparties.site/
+https://jrecchia.students.nomoreparties.sbs/
